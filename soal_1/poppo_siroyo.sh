@@ -9,11 +9,22 @@ wget -q --no-check-certificate "https://docs.google.com/uc?export=download&id=$k
 
 
 #jumlah buku (a)
-awk -F, '$2 == "Chris Hemsworth" { count++ } END { print "Chris Hemsworth membaca "count " buku."}' "$nama_file"
-
+jumlah_buku() {
+awk -F, '
+BEGIN {count = 0}
+$2 == "Chris Hemsworth" { count++ } 
+END {
+	if (count > 0){
+	print "Chris Hemsworth membaca "count " buku."
+	} else {
+	print "coba lagi"
+	}
+}' "$nama_file"	
+}
 
 
 #rata_rata durasi baca (b)
+rata_rata_durasi() {
 awk -F, '
 BEGIN{
 	total = 0
@@ -28,10 +39,11 @@ END {
 		print "Rata-rata durasi membaca dengan Tablet adalah " total / count " menit."
 	} else {print "coba lagi." }
 }' "$nama_file"
-
+}
 
 
 #rating tinggi (c)
+rating_tertinggi() {
 awk -F, '
 BEGIN {rating = 0}
 NR > 1 {
@@ -46,10 +58,11 @@ END {
 	print "Pembaca dengan rating tertinggi:", nama, "-", judul, "-", rating
 	} else { print "coba lagi."}
 }' "$nama_file"
-
+}
 
 
 #genre populer (d)
+genre_populer() {
 awk -F, '
 BEGIN {tukar = 0}
 NR > 1 {
@@ -66,8 +79,24 @@ END {
 }
 if (tukar > 0) {
 	print "Genre paling populer di Asia setelah 2023 adalah", populer, "dengan", tukar, "buku."
-	} else {
-	print "coba lagi."
-}
+	} else {print "coba lagi."}
 }' "$nama_file"
+}
+
+echo "Pilih soal a,b,c,d:"
+read -p "Masukkan pilihan: " soal
+
+if [[ $soal == "a" ]] then 
+	jumlah_buku
+
+elif [[ $soal == "b" ]] then 
+	rata_rata_durasi
+elif [[ $soal == "c" ]] then 
+	rating_tertinggi
+elif [[ $soal == "d" ]] then 
+	genre_populer
+
+else echo "pilihan tidak tersedia."
+
+fi
 
