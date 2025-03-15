@@ -100,6 +100,5 @@ else echo "pilihan tidak tersedia."
 
 fi
 
-awk -F, '$8 == "Tablet" {sum+=$7; count++} END {if (count > 0) print "Rata-rata durasi membaca dengan Tablet adalah " sum/count " menit"}' "$name_file"
 
-awk -F',' 'NR > 1 {if ($7 > max) {title = $3;max = $7; name = $2}} END {print "Pembaca dengan rating tertinggi: " name " - " title  " - " max}' "$name_file"
+
