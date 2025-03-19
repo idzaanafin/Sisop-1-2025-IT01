@@ -19,6 +19,7 @@ show_menu() {
     echo "========================="
     echo "1. Register"
     echo "2. Login"
+    echo "3. Exit"
     echo "========================="
 
 }
@@ -53,6 +54,10 @@ while true;do
 				manager
 			done
 		fi
+		;;
+	3)
+		echo "Exiting!..."
+		exit 0
 		;;
 	*)
 		echo "Invalid choice!"
