@@ -759,7 +759,7 @@ echo "[$tanggal $waktu] - Fragment Usage [$usage] - Fragment Count [$(awk '/MemT
 
 
 # Soal 3
-**Diminta untuk membuat sebuah script untuk play lima jenis lagu yang akan menjalankan fungi yang berbeda-beda dengan format ./dsotm.sh --play="<Track>"
+**Diminta untuk membuat sebuah script untuk play lima jenis lagu yang akan menjalankan fungi yang berbeda-beda dengan format ./dsotm.sh --play="<Track>"**
 ## dsotm.sh
 ```
 #!/bin/bash
