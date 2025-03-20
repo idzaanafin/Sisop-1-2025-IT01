@@ -759,8 +759,375 @@ echo "[$tanggal $waktu] - Fragment Usage [$usage] - Fragment Count [$(awk '/MemT
 
 
 # Soal 3
+**Diminta untuk membuat sebuah script untuk play lima jenis lagu yang akan menjalankan fungi yang berbeda-beda dengan format ./dsotm.sh --play="<Track>"
+## dsotm.sh
+```
+#!/bin/bash
+
+echo "Starting"
+echo "3"
+sleep 1
+echo "2"
+sleep 1
+echo "1"
+sleep 1
 
 
+# $0 tuh buat argumen pertama di termainal jadi ntar itu yang --play
+
+Baris=$(tput lines) #buat dapetin baris di terminal #3d
+Kolom=$(tput cols) #buat dapetin kolom di terminal #3d
+simbol=('$' '₤' '€' '¥' '¢' '₹' '₩' '₿' '₣') #simbol buat function money 3d
+: $((Baris--)) #biar stay di layar #3d
+
+if [[  "$1" == --play=* ]]; then
+	lagu="${1#--play=}"
+	case "$lagu" in
+		"Speak to Me")  #3a
+			clear
+			while true
+			do
+				curl -s  "https://www.affirmations.dev" | jq -r '.affirmation'
+				sleep 1
+			done
+		;;
+
+		"On the Run")  #3b
+			clear
+			progress=0
+			progressmax=100
+			panjangbar=100
+			while [ $progress -le $progressmax ]
+			do
+				panjangisi=$((progress * panjangbar / progressmax))
+				panjangkosong=$((panjangbar - panjangisi))
+				bar=$(printf '*%.0s' $(seq 1 $panjangisi)) #ganti isi progress bar nya disini
+				kosong=$(printf ' %.0s' $(seq 1 $panjangkosong))
+
+				printf "\rProgres: [%s%s] %d%%" "$bar" "$kosong" "$progress"
+
+				sleep $(awk -v min=0.1 -v max=1 'BEGIN{srand(); print min+rand()*(max-min)}')
+				progress=$((progress + 1))
+			done
+
+			echo -e "\nSelesai ;D"
+		;;
+
+		"Time")  #3c
+			clear
+			while true
+			do
+				date=$(date '+%A %d/%m/%y %r')
+				echo -ne " Today is $date\r"
+				sleep 1
+			done
+		;;
+
+		"Money") #3d
+			clear
+			while true
+			do
+			(
+			j=$((RANDOM % Kolom +1)) #posisi acak
+			d=$((RANDOM % Baris +1)) #panjang acak
+				for ((i = 1; i <= Baris; i += 2))
+				do
+				c=${simbol[RANDOM % ${#simbol[@]}]}
+				echo -e "\033[$((i - 1));${j}H\033[32m$c"
+				echo -e "\033[${i};${j}H\033[37m$c"
+				sleep 0.1
+					if [ $i -ge $d ]; then
+						echo -e "\033[$((i - d));${j}H "
+					fi
+				done
+				for ((k = i - d; k <= Baris; k++))
+				do
+					echo -e "\033[${i};${j}H "
+					sleep 0.1
+				done
+			) 
+			sleep 0.05
+			done
+
+		;;
+
+		"Brain Damage") #3e
+			while true
+			do
+			clear
+			echo -e "PID\tUser\t%CPU\t%MEM\tCOMMAND"
+			
+			for pid in /proc/[0-9]*
+			do
+			pid=${pid#/proc/}
+			if [[ -f /proc/$pid/stat ]]; then
+				comm=$(awk '{print $2}' /proc/$pid/stat)
+				user=$(ls -ld /proc/$pid | awk '{print $3}')
+
+				#buat ambil cpu usage
+				uptime=$(awk '{print $1}' /proc/uptime)
+				stat=$(cat /proc/$pid/stat)
+				utime=$(echo $stat | awk '{print $14}')
+				stime=$(echo $stat | awk '{print $15}')
+				starttime=$(echo $stat | awk '{print $22}')
+				hz=$(getconf CLK_TCK)
+				totaltime=$((utime + stime))
+				seconds=$(echo "$uptime - ($starttime / $hz)" | bc)
+				cpuusage=$(echo "scale=2; $totaltime * 100 / ($hz * seconds)" | bc 2>/dev/null || echo 0)
+			
+				#buat hitung memory usage
+				memusage=$(awk '/VmRSS/ {print $2}' /proc/$pid/status 2>/dev/null || echo 0)
+				totalmem=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
+				mempersen=$(echo "scale=2; $memusage * 100 / $totalmem" | bc)
+			
+				#tampilin hasil
+				printf "%-8s %-8s %-6.2f %-6.2f %s\n" "$pid" "$user" "$cpuusage" "$mempersen" "$comm"
+			fi;
+
+			done | sort -k3 -nr | head -n 10
+			sleep 1
+
+			done
+		;;
+
+		*)
+		echo "Lagu yang dicari tidak ada"
+
+		;;
+
+	esac
+else 
+	echo "salah command cuyh woilah"
+fi
+```
+#### untuk membaca argumen sesuai dengan ketentuan
+```
+if [[  "$1" == --play=* ]]; then
+	lagu="${1#--play=}"
+case "$lagu" in
+*)
+		echo "Lagu yang dicari tidak ada"
+
+		;;
+
+	esac
+else 
+	echo "salah command cuyh woilah"
+fi
+```
+## **speak to me**
+```
+ "Speak to Me")  #3a
+			clear
+			while true
+			do
+				curl -s  "https://www.affirmations.dev" | jq -r '.affirmation'
+				sleep 1
+			done
+		;;
+```
+- menggunakan curl dan juga jq kita bisa memanggil API dari "https://github.com/annthurium/affirmations" untuk menampilkan afirmasi secara acak dengan jeda interval satu detik
+
+## **On the Run**
+```
+"On the Run")  #3b
+			clear
+			progress=0
+			progressmax=100
+			panjangbar=100 #bisa dicustom
+			while [ $progress -le $progressmax ]
+			do
+				panjangisi=$((progress * panjangbar / progressmax))
+				panjangkosong=$((panjangbar - panjangisi))
+				bar=$(printf '*%.0s' $(seq 1 $panjangisi)) #ganti isi progress bar nya disini
+				kosong=$(printf ' %.0s' $(seq 1 $panjangkosong))
+
+				printf "\rProgres: [%s%s] %d%%" "$bar" "$kosong" "$progress"
+
+				sleep $(awk -v min=0.1 -v max=1 'BEGIN{srand(); print min+rand()*(max-min)}')
+				progress=$((progress + 1))
+			done
+
+			echo -e "\nSelesai ;D"
+		;;
+```
+- Disini kita membuat progress bar yang akan meningkat dengan interval random dari 0,1 detik hingga 1 detik
+### interval random menggunakan 
+```
+        sleep $(awk -v min=0.1 -v max=1 'BEGIN{srand(); print min+rand()*(max-min)}')
+				progress=$((progress + 1))
+```
+
+## **Time**
+```
+"Time")  #3c
+			clear
+			while true
+			do
+				date=$(date '+%A %d/%m/%y %r')
+				echo -ne " Today is $date\r"
+				sleep 1
+			done
+		;;
+```
+- Menggunakan date kita bisa mengkostumisasi apa yang ingin ditampilkan
+### penjelasan
+```
+%A akan menampilkan hari dengan lengkap, seperti Wednesday
+%d/%m/%y akan menampilkan tanggal/bulan/tahun(2 digit) 
+%r akan menunjukan jam, menit, detik dengan format 12 jam AM/PM
+```
+
+## Money
+```
+Baris=$(tput lines) #buat dapetin baris di terminal
+Kolom=$(tput cols) #buat dapetin kolom di terminal
+simbol=('$' '₤' '€' '¥' '¢' '₹' '₩' '₿' '₣') #simbol buat function money
+: $((Baris--)) #biar stay di layar
+
+"Money") #3d
+			clear
+			while true
+			do
+			(
+			j=$((RANDOM % Kolom +1)) #posisi acak
+			d=$((RANDOM % Baris +1)) #panjang acak
+				for ((i = 1; i <= Baris; i += 2))
+				do
+				c=${simbol[RANDOM % ${#simbol[@]}]}
+				echo -e "\033[$((i - 1));${j}H\033[32m$c"
+				echo -e "\033[${i};${j}H\033[37m$c"
+				sleep 0.1
+					if [ $i -ge $d ]; then
+						echo -e "\033[$((i - d));${j}H "
+					fi
+				done
+				for ((k = i - d; k <= Baris; k++))
+				do
+					echo -e "\033[${i};${j}H "
+					sleep 0.1
+				done
+			) 
+			sleep 0.05
+			done
+
+		;;
+```
+
+### penjelasan
+```
+Baris=$(tput lines) #buat dapetin baris di terminal
+Kolom=$(tput cols) #buat dapetin kolom di terminal
+simbol=('$' '₤' '€' '¥' '¢' '₹' '₩' '₿' '₣') #simbol buat function money
+```
+- persiapan variabel baris, kolom, dan juga simbol yang akan digunakan
+
+```
+while true
+			do
+			(
+			j=$((RANDOM % Kolom +1)) #posisi acak
+			d=$((RANDOM % Baris +1)) #panjang acak
+				for ((i = 1; i <= Baris; i += 2))
+				do
+				c=${simbol[RANDOM % ${#simbol[@]}]}
+				echo -e "\033[$((i - 1));${j}H\033[32m$c"
+				echo -e "\033[${i};${j}H\033[37m$c"
+				sleep 0.1
+```
+- untuk membuat animasi simbol jatuh
+
+```
+          if [ $i -ge $d ]; then
+						echo -e "\033[$((i - d));${j}H "
+					fi
+``` 
+- menghapus animasi saat melewati panjang aliran
+  
+## **Brain Damage**
+```
+"Brain Damage") #3e
+			while true
+			do
+			clear
+			echo -e "PID\tUser\t%CPU\t%MEM\tCOMMAND"
+			
+			for pid in /proc/[0-9]*
+			do
+			pid=${pid#/proc/}
+			if [[ -f /proc/$pid/stat ]]; then
+				comm=$(awk '{print $2}' /proc/$pid/stat)
+				user=$(ls -ld /proc/$pid | awk '{print $3}')
+
+				#buat ambil cpu usage
+				uptime=$(awk '{print $1}' /proc/uptime)
+				stat=$(cat /proc/$pid/stat)
+				utime=$(echo $stat | awk '{print $14}')
+				stime=$(echo $stat | awk '{print $15}')
+				starttime=$(echo $stat | awk '{print $22}')
+				hz=$(getconf CLK_TCK)
+				totaltime=$((utime + stime))
+				seconds=$(echo "$uptime - ($starttime / $hz)" | bc)
+				cpuusage=$(echo "scale=2; $totaltime * 100 / ($hz * seconds)" | bc 2>/dev/null || echo 0)
+			
+				#buat hitung memory usage
+				memusage=$(awk '/VmRSS/ {print $2}' /proc/$pid/status 2>/dev/null || echo 0)
+				totalmem=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
+				mempersen=$(echo "scale=2; $memusage * 100 / $totalmem" | bc)
+			
+				#tampilin hasil
+				printf "%-8s %-8s %-6.2f %-6.2f %s\n" "$pid" "$user" "$cpuusage" "$mempersen" "$comm"
+			fi;
+
+			done | sort -k3 -nr | head -n 10
+			sleep 1
+
+			done
+		;;
+```
+
+### penjelasan
+```
+for pid in /proc/[0-9]*
+			do
+			pid=${pid#/proc/}
+        if [[ -f /proc/$pid/stat ]]; then
+				comm=$(awk '{print $2}' /proc/$pid/stat)
+				user=$(ls -ld /proc/$pid | awk '{print $3}')
+```
+- digunakan untuk mengambil pid dan juga informasi terkait user proses
+
+```
+uptime=$(awk '{print $1}' /proc/uptime)
+				stat=$(cat /proc/$pid/stat)
+				utime=$(echo $stat | awk '{print $14}')
+				stime=$(echo $stat | awk '{print $15}')
+				starttime=$(echo $stat | awk '{print $22}')
+				hz=$(getconf CLK_TCK)
+				totaltime=$((utime + stime))
+				seconds=$(echo "$uptime - ($starttime / $hz)" | bc)
+				cpuusage=$(echo "scale=2; $totaltime * 100 / ($hz * seconds)" | bc 2>/dev/null || echo 0)
+```
+- digunakan untuk menghitung cpu usage
+
+ ```
+memusage=$(awk '/VmRSS/ {print $2}' /proc/$pid/status 2>/dev/null || echo 0)
+				totalmem=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
+				mempersen=$(echo "scale=2; $memusage * 100 / $totalmem" | bc)
+```
+- digunakan untuk menghitung memory usage
+
+```
+printf "%-8s %-8s %-6.2f %-6.2f %s\n" "$pid" "$user" "$cpuusage" "$mempersen" "$comm"
+```
+- menampilkan hasil
+
+```
+done | sort -k3 -nr | head -n 10
+```
+- digunakan agar hanya menampilkan 10 proses teratas saja
+
+  
 # Soal 4
 **Diberikan file csv "pokemon_usage.csv" kemudian diminta untuk membuat script untuk mempermudah analisis csv tersebut. Dimana program harus memiliki ketentuan fitur/option berikut:**
 - **--info : melihat summary pokemon yang memiliki nilai tertinggi untuk column Usage%, dan nilai tertinggi untuk column Raw Usage**
