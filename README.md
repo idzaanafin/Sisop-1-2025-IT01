@@ -429,7 +429,7 @@ done
   show_menu
   ```
 #### Fungsi Utama
-- jika input user adalah 1 maka akan memanggil fungsi register. Jika return True maka program akan menyimpan informasi ke database
+- jika input user adalah 1 maka akan memanggil fungsi register. Jika return True maka program akan menyimpan informasi ke database, dan password akan disimpan menggunakan static salt dengan format hash sha256
   ```
   if register_user; then
           password=$(echo -n "IT01-$password-SISOPEZGAMING" | sha256sum | awk '{print $1}')
